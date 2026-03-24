@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # 🏡 Rental Property Management System (Mini NoBroker)
 
 A complete full-stack web application using Django, featuring a clean UI with role-based functionality for Tenants, Owners, and Admins.
@@ -63,3 +64,6 @@ A complete full-stack web application using Django, featuring a clean UI with ro
 - Search for properties using the smart search bar e.g. "2BHK under 15000".
 - Book a property, save to wishlist, and send a message to the owner.
 - Test the chatbot on the bottom right of the screen.
+=======
+# Rental-Management-System
+>>>>>>> 7a7869e1d15169d9b1ea43b90a1a6630688b90ae

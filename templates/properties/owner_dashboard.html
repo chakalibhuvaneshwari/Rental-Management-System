@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+{% block title %}Owner Dashboard - Mini NoBroker{% endblock %}
+
+{% block content %}
+<div class="row mb-5" data-aos="fade-down">
+    <div class="col-12 text-center text-white p-5 rounded-3" style="background: linear-gradient(135deg, var(--primary-color), var(--hover-color));">
+        <h2 class="display-5 fw-bold"><i class="fa-solid fa-chart-pie"></i> Owner Dashboard</h2>
+        <p class="fs-5">Manage your properties and bookings</p>
+        <a href="{% url 'add_property' %}" class="btn btn-light btn-lg mt-3"><i class="fa-solid fa-plus text-success"></i> Add New Property</a>
+    </div>
+</div>
+
+<div class="row mb-5 text-center">
+    <!-- Messages Quick Action -->
+    <div class="col-md-6 mb-3" data-aos="fade-up" data-aos-delay="100">
+        <div class="card property-card p-4 h-100 d-flex flex-column align-items-center justify-content-center border-primary shadow-sm" style="border-width: 2px;">
+            <i class="fa-solid fa-comments fs-1 text-primary mb-3"></i>
+            <h4>Tenant Messages</h4>
+            <p class="text-muted small">Reply to questions and chat with potential tenants.</p>
+            <a href="{% url 'messages' %}" class="btn btn-outline-primary mt-auto w-50">Open Inbox</a>
+        </div>
+    </div>
+    
+    <!-- View Booking Requests Quick Action -->
+    <div class="col-md-6 mb-3" data-aos="fade-up" data-aos-delay="200">
+        <div class="card property-card p-4 h-100 d-flex flex-column align-items-center justify-content-center border-warning shadow-sm" style="border-width: 2px;">
+            <i class="fa-solid fa-bell fs-1 text-warning mb-3"></i>
+            <h4>View Booking Requests</h4>
+            <p class="text-muted small">See who wants to rent your properties.</p>
+            <a href="{% url 'manage_bookings' %}" class="btn btn-outline-warning mt-auto w-50 fw-bold">Manage Requests</a>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12 mb-3 d-flex justify-content-between align-items-center">
+        <h3><i class="fa-solid fa-building"></i> My Properties</h3>
+    </div>
+</div>
+
+<div class="row">
+    {% for prop in properties %}
+    <div class="col-md-4 mb-4" data-aos="fade-up" data-aos-delay="{{ forloop.counter }}00">
+        <div class="card property-card h-100 border-success" style="border-width: 2px;">
+            <div class="card-body">
+                <div class="d-flex justify-content-between mb-2">
+                    <span class="badge bg-success">{{ prop.property_type }}</span>
+                    {% if prop.is_available %}
+                    <span class="badge bg-info">Available</span>
+                    {% else %}
+                    <span class="badge bg-danger">Occupied</span>
+                    {% endif %}
+                </div>
+                <h5 class="card-title text-truncate">{{ prop.title }}</h5>
+                <p class="card-text text-muted mb-2"><i class="fa-solid fa-location-dot"></i> {{ prop.location }}, {{ prop.city }}</p>
+                <div class="d-flex justify-content-between align-items-center bg-light p-2 rounded">
+                    <span class="fw-bold">₹{{ prop.price }}/mo</span>
+                    <span><i class="fa-solid fa-bed"></i> {{ prop.sharing_capacity }}</span>
+                </div>
+            </div>
+            <div class="card-footer bg-white border-0 pb-3 d-flex gap-2">
+                <a href="{% url 'property_detail' prop.pk %}" class="btn btn-outline-success w-50">View</a>
+                <!-- Future Delete Feature Placeholder -->
+                <button class="btn btn-outline-danger w-50" disabled>Remove</button>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="col-12 text-center py-5">
+        <i class="fa-solid fa-house-circle-exclamation fs-1 text-muted mb-3"></i>
+        <h4>You haven't listed any properties yet!</h4>
+        <p class="text-muted">Click the button above to add your first listing.</p>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

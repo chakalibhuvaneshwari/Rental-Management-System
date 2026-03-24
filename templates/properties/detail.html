@@ -1,0 +1,150 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ property.title }} - Mini NoBroker{% endblock %}
+
+{% block extra_head %}
+<!-- Leaflet CSS -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+<style>
+    #map { height: 300px; border-radius: 12px; z-index: 1;}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row mt-4" data-aos="fade-in">
+    <div class="col-12 mb-3">
+        <a href="{% url 'home' %}" class="text-decoration-none text-muted"><i class="fa-solid fa-arrow-left"></i> Back to listings</a>
+    </div>
+</div>
+
+<div class="row mb-5">
+    <!-- Property Details -->
+    <div class="col-md-8 mb-4" data-aos="slide-right">
+        <div class="card property-card p-4">
+            <h2 class="mb-3">{{ property.title }}</h2>
+            <p class="text-muted fs-5"><i class="fa-solid fa-location-dot text-danger"></i> {{ property.location }}, {{ property.city }}</p>
+            
+            <div class="d-flex flex-wrap gap-2 mb-4">
+                <span class="badge bg-primary fs-6">{{ property.property_type }}</span>
+                <span class="badge bg-info fs-6">{{ property.get_room_type_display }}</span>
+                <span class="badge bg-secondary fs-6"><i class="fa-solid fa-users"></i> Capacity: {{ property.sharing_capacity }}</span>
+            </div>
+            
+            <h4 class="text-success mb-4 fs-3 fw-bold">₹{{ property.price }} <span class="fs-6 text-muted fw-normal">/ month</span></h4>
+            
+            <h5 class="mb-3 border-bottom pb-2">Description</h5>
+            <p class="mb-4" style="white-space: pre-line;">{{ property.description }}</p>
+            
+            <h5 class="mb-3 border-bottom pb-2">Amenities</h5>
+            <p class="mb-4"><i class="fa-solid fa-check-circle text-success"></i> {{ property.amenities }}</p>
+            
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <p class="mb-1 text-muted">Deposit</p>
+                    <p class="fw-bold">₹{{ property.deposit }}</p>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <p class="mb-1 text-muted">Owner</p>
+                    <p class="fw-bold"><i class="fa-solid fa-user-tie"></i> {{ property.owner.username }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Action Panel & Map -->
+    <div class="col-md-4" data-aos="slide-left">
+        <div class="card property-card p-4 mb-4">
+            <h5 class="mb-3 text-center">Interested in this property?</h5>
+            {% if request.user.is_authenticated and request.user.role == 'TENANT' %}
+            <form action="{% url 'book_property' property.pk %}" method="post">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-primary w-100 mb-2"><i class="fa-solid fa-calendar-check"></i> Request Booking</button>
+            </form>
+            <form action="{% url 'toggle_wishlist' property.pk %}" method="post">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-outline-danger w-100"><i class="fa-solid fa-heart"></i> Add to Wishlist</button>
+            </form>
+            {% elif request.user.is_authenticated and request.user.role == 'OWNER' %}
+                <p class="text-center text-muted">Owners cannot book properties.</p>
+            {% else %}
+                <a href="{% url 'login' %}" class="btn btn-primary w-100">Login to Book</a>
+            {% endif %}
+            
+            {% if request.user.is_authenticated and request.user.role == 'TENANT' %}
+            <hr>
+            <form action="{% url 'send_message' property.pk %}" method="post">
+                {% csrf_token %}
+                <div class="mb-2">
+                    <textarea name="content" class="form-control" rows="2" placeholder="Ask owner a question..." required></textarea>
+                </div>
+                <button type="submit" class="btn btn-outline-info w-100"><i class="fa-solid fa-paper-plane"></i> Send Message</button>
+            </form>
+            {% endif %}
+        </div>
+        
+        <div class="card property-card">
+            <div class="card-header bg-white border-0 pt-3">
+                <h6 class="mb-0"><i class="fa-solid fa-map"></i> Location & Nearby</h6>
+            </div>
+            <div class="card-body p-2">
+                <div id="map"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Similar Properties -->
+{% if similar %}
+<div class="row mb-5" data-aos="fade-up">
+    <h3 class="mb-4">Similar Properties</h3>
+    {% for prop in similar %}
+    <div class="col-md-4 mb-3">
+        <div class="card property-card h-100">
+            <div class="card-body">
+                <h6 class="card-title">{{ prop.title }}</h6>
+                <p class="text-success fw-bold">₹{{ prop.price }}/mo</p>
+                <a href="{% url 'property_detail' prop.pk %}" class="btn btn-sm btn-outline-primary">View</a>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+{% endblock %}
+
+{% block extra_scripts %}
+<!-- Leaflet JS -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        var lat = {{ property.latitude|default:"17.3850" }};
+        var lng = {{ property.longitude|default:"78.4867" }};
+        
+        var map = L.map('map').setView([lat, lng], 13);
+        
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '&copy; OpenStreetMap'
+        }).addTo(map);
+        
+        // Property Marker
+        L.marker([lat, lng]).addTo(map)
+            .bindPopup("<b>{{ property.title }}</b><br>{{ property.location }}").openPopup();
+            
+        // Mock Nearby Facilities
+        var facilities = [
+            {lat: lat + 0.005, lng: lng + 0.005, name: "City Hospital", type: "hospital", icon: "🏥"},
+            {lat: lat - 0.005, lng: lng - 0.005, name: "Global School", type: "school", icon: "🏫"},
+            {lat: lat + 0.003, lng: lng - 0.007, name: "SuperMart", type: "store", icon: "🛒"}
+        ];
+        
+        facilities.forEach(function(fac) {
+            var iconHtml = `<div style="font-size: 24px;">${fac.icon}</div>`;
+            var customIcon = L.divIcon({html: iconHtml, className: 'custom-icon', iconSize: [30, 30]});
+            L.marker([fac.lat, fac.lng], {icon: customIcon}).addTo(map)
+                .bindPopup(`<b>${fac.name}</b>`);
+        });
+    });
+</script>
+{% endblock %}

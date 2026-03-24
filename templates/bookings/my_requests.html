@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+{% block title %}My Requests - Mini NoBroker{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-10" data-aos="fade-down">
+        <h2 class="mb-4"><i class="fa-solid fa-list-check text-primary"></i> My Booking Requests</h2>
+        
+        <div class="card property-card p-4">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Property</th>
+                            <th>Location</th>
+                            <th>Rent/Mo</th>
+                            <th>Status</th>
+                            <th>Requested On</th>
+                            <th>Payment</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for booking in bookings %}
+                        <tr>
+                            <td>
+                                <a href="{% url 'property_detail' booking.property.pk %}" class="text-decoration-none fw-bold">
+                                    {{ booking.property.title }}
+                                </a>
+                            </td>
+                            <td>{{ booking.property.location }}, {{ booking.property.city }}</td>
+                            <td>₹{{ booking.property.price }}</td>
+                            <td>
+                                {% if booking.status == 'PENDING' %}
+                                <span class="badge bg-warning text-dark"><i class="fa-solid fa-clock"></i> Pending</span>
+                                {% elif booking.status == 'ACCEPTED' %}
+                                <span class="badge bg-success"><i class="fa-solid fa-check"></i> Accepted</span>
+                                {% else %}
+                                <span class="badge bg-danger"><i class="fa-solid fa-xmark"></i> Rejected</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ booking.created_at|date:"M d, Y" }}</td>
+                            <td>
+                                {% if booking.status == 'ACCEPTED' %}
+                                    {% if booking.is_paid %}
+                                        <span class="badge bg-primary"><i class="fa-solid fa-receipt"></i> Paid</span>
+                                    {% else %}
+                                        <a href="{% url 'payment_checkout' booking.id %}" class="btn btn-sm btn-outline-success fw-bold">Pay Now</a>
+                                    {% endif %}
+                                {% else %}
+                                    <span class="text-muted small">-</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="6" class="text-center py-4 text-muted">
+                                You haven't made any booking requests yet.
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

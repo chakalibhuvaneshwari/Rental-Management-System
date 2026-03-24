@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+{% block title %}Chat with {{ other_user.username }} - Mini NoBroker{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center h-100 mt-2">
+    <div class="col-md-8" data-aos="fade-up">
+        
+        <div class="d-flex align-items-center mb-3">
+            <a href="{% url 'messages' %}" class="btn btn-sm btn-outline-secondary me-3"><i class="fa-solid fa-arrow-left"></i> Back</a>
+            <h4 class="mb-0">Chat with {{ other_user.username }} <span class="badge bg-secondary ms-2 align-middle" style="font-size: 0.5em;">{{ other_user.get_role_display }}</span></h4>
+        </div>
+
+        <div class="card property-card d-flex flex-column" style="height: 60vh;">
+            <div class="card-body overflow-auto flex-grow-1 p-4" style="background-color: #f8f9fa;">
+                {% for message in messages_list %}
+                    {% if message.sender == request.user %}
+                        <div class="d-flex justify-content-end mb-3">
+                            <div class="bg-primary text-white p-3 rounded-4" style="max-width: 75%; border-bottom-right-radius: 4px;">
+                                <p class="mb-1">{{ message.content }}</p>
+                                <small class="text-white-50 float-end" style="font-size: 0.7em;">{{ message.timestamp|date:"h:i A" }}</small>
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="d-flex justify-content-start mb-3">
+                            <div class="bg-white p-3 rounded-4 shadow-sm border" style="max-width: 75%; border-bottom-left-radius: 4px;">
+                                <p class="mb-1 text-dark">{{ message.content }}</p>
+                                <small class="text-muted float-end" style="font-size: 0.7em;">{{ message.timestamp|date:"h:i A" }}</small>
+                            </div>
+                        </div>
+                    {% endif %}
+                {% empty %}
+                    <div class="text-center text-muted my-5">Say hi to start the conversation!</div>
+                {% endfor %}
+            </div>
+            
+            <div class="card-footer bg-white border-top-0 p-3">
+                <form action="{% url 'message_thread' other_user.id %}" method="post" class="d-flex gap-2">
+                    {% csrf_token %}
+                    <input type="text" name="content" class="form-control rounded-pill" placeholder="Type a message..." required autocomplete="off">
+                    <button type="submit" class="btn btn-primary rounded-circle" style="width: 45px; height: 45px; flex-shrink: 0;">
+                        <i class="fa-solid fa-paper-plane"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    // Scroll to bottom on load
+    window.onload = function() {
+        var chatBox = document.querySelector('.card-body.overflow-auto');
+        if(chatBox) chatBox.scrollTop = chatBox.scrollHeight;
+    };
+</script>
+{% endblock %}

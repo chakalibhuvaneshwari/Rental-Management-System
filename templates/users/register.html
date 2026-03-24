@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+{% block title %}Register - Mini NoBroker{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center mt-5" data-aos="fade-up">
+    <div class="col-md-6">
+        <div class="card property-card p-4">
+            <h3 class="text-center mb-4"><i class="fa-solid fa-user-plus text-primary"></i> Create Account</h3>
+            <form method="post" action="{% url 'register' %}">
+                {% csrf_token %}
+                
+                <div class="mb-3 text-center">
+                    <label class="form-label d-block fw-bold mb-3">I am a:</label>
+                    <div class="btn-group w-100" role="group">
+                        <input type="radio" class="btn-check" name="role" id="roleTenant" value="TENANT" checked>
+                        <label class="btn btn-outline-primary" for="roleTenant"><i class="fa-solid fa-user"></i> Tenant</label>
+                      
+                        <input type="radio" class="btn-check" name="role" id="roleOwner" value="OWNER">
+                        <label class="btn btn-outline-success" for="roleOwner"><i class="fa-solid fa-house-user"></i> Owner</label>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Username</label>
+                    <input type="text" name="username" class="form-control" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Email</label>
+                    <input type="email" name="email" class="form-control" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Phone Number</label>
+                    <input type="text" name="phone_number" class="form-control" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Password</label>
+                    <input type="password" name="password" class="form-control" required>
+                </div>
+                
+                <button type="submit" class="btn btn-primary w-100 mt-2" id="submitBtn">Sign Up as Tenant</button>
+            </form>
+            <div class="mt-3 text-center">
+                <p>Already have an account? <a href="{% url 'login' %}">Login here</a></p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    // Update button text and color based on role selection
+    const roleTenant = document.getElementById('roleTenant');
+    const roleOwner = document.getElementById('roleOwner');
+    const submitBtn = document.getElementById('submitBtn');
+
+    roleTenant.addEventListener('change', () => {
+        if(roleTenant.checked) {
+            submitBtn.textContent = 'Sign Up as Tenant';
+            submitBtn.className = 'btn btn-primary w-100 mt-2';
+        }
+    });
+
+    roleOwner.addEventListener('change', () => {
+        if(roleOwner.checked) {
+            submitBtn.textContent = 'Sign Up as Owner';
+            submitBtn.className = 'btn btn-success w-100 mt-2';
+        }
+    });
+</script>
+{% endblock %}

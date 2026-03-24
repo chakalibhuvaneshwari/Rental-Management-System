@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+{% block title %}Admin Dashboard - Mini NoBroker{% endblock %}
+
+{% block content %}
+<div class="row mb-5" data-aos="fade-down">
+    <div class="col-12 p-5 text-white rounded-3 shadow text-center" style="background: linear-gradient(135deg, var(--primary-color), var(--hover-color));">
+        <h2 class="display-5 fw-bold"><i class="fa-solid fa-chart-line"></i> Admin Controls</h2>
+        <p class="fs-5">System overview and statistics</p>
+        <a href="/admin/" class="btn btn-light mt-2" target="_blank"><i class="fa-solid fa-database text-warning"></i> Open Advanced Backend</a>
+    </div>
+</div>
+
+<div class="row mb-5 text-center">
+    <div class="col-md-4 mb-3" data-aos="fade-up" data-aos-delay="100">
+        <div class="card property-card p-4 border-warning border-2">
+            <i class="fa-solid fa-users fs-1 text-warning mb-3"></i>
+            <h1 class="display-4 fw-bold">{{ total_users }}</h1>
+            <h5 class="text-muted">Registered Users</h5>
+        </div>
+    </div>
+    <div class="col-md-4 mb-3" data-aos="fade-up" data-aos-delay="200">
+        <div class="card property-card p-4 border-success border-2">
+            <i class="fa-solid fa-building fs-1 text-success mb-3"></i>
+            <h1 class="display-4 fw-bold">{{ total_properties }}</h1>
+            <h5 class="text-muted">Total Properties</h5>
+        </div>
+    </div>
+    <div class="col-md-4 mb-3" data-aos="fade-up" data-aos-delay="300">
+        <div class="card property-card p-4 border-primary border-2">
+            <i class="fa-solid fa-handshake fs-1 text-primary mb-3"></i>
+            <h1 class="display-4 fw-bold">{{ total_bookings }}</h1>
+            <h5 class="text-muted">Booking Requests</h5>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-6 mb-4" data-aos="slide-right">
+        <div class="card property-card h-100">
+            <div class="card-header bg-white pt-3 border-0">
+                <h5 class="mb-0"><i class="fa-solid fa-user-plus text-muted"></i> Recent Registrations</h5>
+            </div>
+            <div class="card-body">
+                <ul class="list-group list-group-flush">
+                    {% for u in recent_users %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <div>
+                            <strong>{{ u.username }}</strong>
+                            <div class="small text-muted">{{ u.date_joined|date:"M d, Y" }}</div>
+                        </div>
+                        <span class="badge bg-secondary">{{ u.get_role_display }}</span>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 mb-4" data-aos="slide-left">
+        <div class="card property-card h-100">
+            <div class="card-header bg-white pt-3 border-0">
+                <h5 class="mb-0"><i class="fa-solid fa-city text-muted"></i> Latest Properties</h5>
+            </div>
+            <div class="card-body">
+                <ul class="list-group list-group-flush">
+                    {% for p in recent_properties %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <div class="text-truncate flex-grow-1">
+                            <strong>{{ p.title }}</strong>
+                            <div class="small text-muted">{{ p.location }}, {{ p.city }}</div>
+                        </div>
+                        <span class="badge bg-success ms-2">₹{{ p.price }}</span>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

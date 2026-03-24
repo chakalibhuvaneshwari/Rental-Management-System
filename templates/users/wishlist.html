@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% block title %}My Wishlist - Mini NoBroker{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12 text-center" data-aos="fade-down">
+        <h2 class="display-6 fw-bold text-danger"><i class="fa-solid fa-heart"></i> My Wishlist</h2>
+        <p class="text-muted">Properties you've saved for later</p>
+    </div>
+</div>
+
+<div class="row">
+    {% for item in wishlist_items %}
+    <div class="col-md-4 mb-4" data-aos="fade-up" data-aos-delay="{{ forloop.counter }}00">
+        <div class="card property-card h-100">
+            {% if item.property.image %}
+            <img src="{{ item.property.image.url }}" class="card-img-top" alt="{{ item.property.title }}" style="height: 200px; object-fit: cover;">
+            {% else %}
+            <div class="card-img-top bg-secondary text-white d-flex align-items-center justify-content-center" style="height: 200px;">
+                <i class="fa-solid fa-house-chimney fs-1"></i>
+            </div>
+            {% endif %}
+            
+            <div class="card-body">
+                <div class="d-flex justify-content-between mb-2">
+                    <span class="badge bg-primary">{{ item.property.property_type }}</span>
+                    <span class="badge bg-success">₹{{ item.property.price }}/mo</span>
+                </div>
+                <h5 class="card-title text-truncate">{{ item.property.title }}</h5>
+                <p class="card-text text-muted mb-2"><i class="fa-solid fa-location-dot"></i> {{ item.property.location }}, {{ item.property.city }}</p>
+            </div>
+            <div class="card-footer bg-white border-0 pb-3 d-flex gap-2">
+                <a href="{% url 'property_detail' item.property.pk %}" class="btn btn-primary w-50">View Details</a>
+                <form action="{% url 'toggle_wishlist' item.property.pk %}" method="post" class="w-50">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-outline-danger w-100">Remove</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="col-12 text-center py-5">
+        <i class="fa-solid fa-heart-crack fs-1 text-muted mb-3"></i>
+        <h4>Your wishlist is empty!</h4>
+        <p class="text-muted">Browse properties and click the heart icon to add them here.</p>
+        <a href="{% url 'home' %}" class="btn btn-primary mt-2">Browse Properties</a>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

@@ -1,0 +1,90 @@
+<!-- Chatbot Window -->
+<div class="chatbot-window" id="chatWindow">
+    <div class="chatbot-header">
+        <h6 class="mb-0"><i class="fa-solid fa-robot"></i> Assistant</h6>
+        <i class="fa-solid fa-times" style="cursor: pointer;" onclick="toggleChat()"></i>
+    </div>
+    
+    <div class="chatbot-body" id="chatBody">
+        <div class="d-flex mb-3">
+            <div class="bg-primary text-white p-2 rounded-3" style="max-width: 80%;">
+                Hi! I'm your NoBroker Assistant. How can I help?
+            </div>
+        </div>
+    </div>
+    
+    <div class="chatbot-input">
+        <input type="text" id="chatInput" class="form-control border-0 bg-light" placeholder="Type a message..." onkeypress="handleEnter(event)">
+        <button class="btn btn-primary ms-2" onclick="sendMessage()"><i class="fa-solid fa-paper-plane"></i></button>
+    </div>
+</div>
+
+<script>
+    function toggleChat() {
+        const chatWindow = document.getElementById('chatWindow');
+        if(chatWindow.style.display === 'flex') {
+            chatWindow.style.display = 'none';
+        } else {
+            chatWindow.style.display = 'flex';
+        }
+    }
+    
+    function handleEnter(e) {
+        if(e.key === 'Enter') {
+            sendMessage();
+        }
+    }
+    
+    function appendMessage(text, isUser) {
+        const chatBody = document.getElementById('chatBody');
+        const div = document.createElement('div');
+        div.className = `d-flex mb-3 ${isUser ? 'justify-content-end' : ''}`;
+        
+        const innerDiv = document.createElement('div');
+        innerDiv.className = `p-2 rounded-3 ${isUser ? 'bg-success text-white' : 'bg-primary text-white'}`;
+        innerDiv.style.maxWidth = '80%';
+        innerDiv.innerText = text;
+        
+        div.appendChild(innerDiv);
+        chatBody.appendChild(div);
+        chatBody.scrollTop = chatBody.scrollHeight;
+    }
+    
+    function sendMessage() {
+        const input = document.getElementById('chatInput');
+        const text = input.value.trim();
+        if(!text) return;
+        
+        // Append user message
+        appendMessage(text, true);
+        input.value = '';
+        
+        // Show typing indicator
+        const typingId = 'typing-' + Date.now();
+        const chatBody = document.getElementById('chatBody');
+        const typingDiv = document.createElement('div');
+        typingDiv.id = typingId;
+        typingDiv.className = 'd-flex mb-3';
+        typingDiv.innerHTML = `<div class="bg-secondary text-white p-2 rounded-3 small">Typing...</div>`;
+        chatBody.appendChild(typingDiv);
+        chatBody.scrollTop = chatBody.scrollHeight;
+        
+        // Fetch API
+        fetch('/chat/api/reply/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({message: text})
+        })
+        .then(res => res.json())
+        .then(data => {
+            document.getElementById(typingId).remove();
+            appendMessage(data.reply, false);
+        })
+        .catch(err => {
+            document.getElementById(typingId).remove();
+            appendMessage("Sorry, I'm offline.", false);
+        });
+    }
+</script>

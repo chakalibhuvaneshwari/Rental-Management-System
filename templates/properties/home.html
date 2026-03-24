@@ -1,0 +1,112 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Home - Mini NoBroker{% endblock %}
+
+{% block content %}
+<!-- Hero Section with Smart Search -->
+<div class="row mb-5" data-aos="fade-down">
+    <div class="col-12">
+        <div class="p-5 text-center bg-light rounded-3" style="background: linear-gradient(135deg, var(--card-bg), #e9ecef); box-shadow: 0 5px 15px rgba(0,0,0,0.05);">
+            <h1 class="display-5 fw-bold text-primary mb-3">Find Your Perfect Home <i class="fa-solid fa-house-chimney-window"></i></h1>
+            <p class="fs-5 text-muted mb-4">Search intelligently using natural language</p>
+            
+            <form action="{% url 'home' %}" method="get" class="d-flex justify-content-center">
+                <div class="input-group w-75 shadow-sm rounded-pill overflow-hidden">
+                    <span class="input-group-text bg-white border-0"><i class="fa-solid fa-magnifying-glass text-muted"></i></span>
+                    <input type="text" name="q" class="form-control border-0 py-3" value="{{ query }}" placeholder="Search like: 2BHK under 8000 in Hyderabad sharing for 3">
+                    <button class="btn btn-primary px-4" type="submit">Search</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Categories -->
+{% if not query %}
+<div class="row mb-5 text-center" data-aos="fade-up">
+    <h3 class="mb-4">Browse by Category</h3>
+    <div class="col-md-3 col-6 mb-3">
+        <a href="?q=1bhk" class="text-decoration-none">
+            <div class="card property-card py-4">
+                <i class="fa-solid fa-door-open fs-1 text-primary mb-2"></i>
+                <h5 class="text-dark">1 BHK</h5>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-3 col-6 mb-3">
+        <a href="?q=2bhk" class="text-decoration-none">
+            <div class="card property-card py-4">
+                <i class="fa-solid fa-house fs-1 text-success mb-2"></i>
+                <h5 class="text-dark">2 BHK</h5>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-3 col-6 mb-3">
+        <a href="?q=sharing" class="text-decoration-none">
+            <div class="card property-card py-4">
+                <i class="fa-solid fa-users fs-1 text-warning mb-2"></i>
+                <h5 class="text-dark">Sharing</h5>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-3 col-6 mb-3">
+        <a href="?q=villa" class="text-decoration-none">
+            <div class="card property-card py-4">
+                <i class="fa-solid fa-city fs-1 text-danger mb-2"></i>
+                <h5 class="text-dark">Villa</h5>
+            </div>
+        </a>
+    </div>
+</div>
+{% endif %}
+
+<!-- Properties List -->
+<div class="row">
+    <div class="col-12 mb-4 d-flex justify-content-between align-items-center">
+        <h3>{% if query %}Search Results for "{{ query }}"{% else %}Recently Added Models{% endif %}</h3>
+        {% if query %}
+        <a href="{% url 'home' %}" class="btn btn-outline-secondary btn-sm">Clear Search</a>
+        {% endif %}
+    </div>
+
+    {% for prop in properties %}
+    <div class="col-md-4 mb-4" data-aos="fade-up" data-aos-delay="{{ forloop.counter }}00">
+        <div class="card property-card h-100">
+            {% if prop.image %}
+            <img src="{{ prop.image.url }}" class="card-img-top" alt="{{ prop.title }}" style="height: 200px; object-fit: cover;">
+            {% else %}
+            <div class="card-img-top bg-secondary text-white d-flex align-items-center justify-content-center" style="height: 200px;">
+                <i class="fa-solid fa-house-chimney fs-1"></i>
+            </div>
+            {% endif %}
+            <div class="card-body">
+                <div class="d-flex justify-content-between mb-2">
+                    <span class="badge bg-primary">{{ prop.property_type }}</span>
+                    <span class="badge bg-success">₹{{ prop.price }}/mo</span>
+                </div>
+                <h5 class="card-title text-truncate">{{ prop.title }}</h5>
+                <p class="card-text text-muted mb-2"><i class="fa-solid fa-location-dot"></i> {{ prop.location }}, {{ prop.city }}</p>
+                <p class="card-text small text-muted"><i class="fa-solid fa-bed"></i> {{ prop.get_room_type_display }} • Cap: {{ prop.sharing_capacity }}</p>
+            </div>
+            <div class="card-footer bg-white border-0 pb-3">
+                <a href="{% url 'property_detail' prop.pk %}" class="btn btn-outline-primary w-100">View Details</a>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="col-12 text-center py-5">
+        <i class="fa-solid fa-box-open fs-1 text-muted mb-3"></i>
+        <h4>No properties found!</h4>
+        <p class="text-muted">Try adjusting your search query.</p>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- Floating Chatbot Placeholder Button -->
+<div class="chatbot-btn" onclick="toggleChat()">
+    <i class="fa-solid fa-robot"></i>
+</div>
+
+{% include 'chat/widget.html' %} <!-- We'll create this later -->
+
+{% endblock %}

@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+{% block title %}Checkout - Mini NoBroker{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center mt-3">
+    <div class="col-md-8 col-lg-6" data-aos="zoom-in">
+        <div class="card property-card border-0 shadow-lg overflow-hidden">
+            <div class="bg-primary text-white p-4 text-center">
+                <i class="fa-solid fa-shield-halved fs-1 mb-3"></i>
+                <h3 class="mb-0">Secure Checkout</h3>
+                <p class="mb-0 opacity-75">Pay deposit to finalize your booking</p>
+            </div>
+            
+            <div class="card-body p-4 p-md-5">
+                <div class="mb-4 bg-light p-3 rounded-3 border">
+                    <h5 class="fw-bold mb-1">{{ booking.property.title }}</h5>
+                    <p class="text-muted small mb-2"><i class="fa-solid fa-location-dot"></i> {{ booking.property.location }}, {{ booking.property.city }}</p>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="text-muted">Deposit Amount:</span>
+                        <h4 class="text-success mb-0 fw-bold">₹{{ booking.property.deposit }}</h4>
+                    </div>
+                </div>
+
+                <form action="{% url 'process_payment' booking.id %}" method="post">
+                    {% csrf_token %}
+                    <h5 class="mb-3">Payment Details</h5>
+                    
+                    <div class="mb-3">
+                        <label class="form-label text-muted small">Card Number</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-white"><i class="fa-brands fa-cc-visa text-primary"></i></span>
+                            <input type="text" class="form-control" placeholder="0000 0000 0000 0000" required>
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-4">
+                        <div class="col-6">
+                            <label class="form-label text-muted small">Expiry Date</label>
+                            <input type="text" class="form-control" placeholder="MM/YY" required>
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label text-muted small">CVV</label>
+                            <input type="password" class="form-control" placeholder="•••" required>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label class="form-label text-muted small">Name on Card</label>
+                        <input type="text" class="form-control" placeholder="John Doe" value="{{ request.user.get_full_name|default:request.user.username }}" required>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-success w-100 py-3 fw-bold fs-5 shadow-sm rounded-pill">
+                        <i class="fa-solid fa-lock"></i> Pay ₹{{ booking.property.deposit }} safely
+                    </button>
+                    <p class="text-center text-muted mt-3 small"><i class="fa-solid fa-circle-check text-success"></i> 256-bit secure encryption</p>
+                </form>
+            </div>
+        </div>
+        <div class="text-center mt-3">
+            <a href="{% url 'my_requests' %}" class="text-decoration-none text-muted"><i class="fa-solid fa-arrow-left"></i> Cancel and return</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
